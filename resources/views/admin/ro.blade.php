@@ -2,8 +2,9 @@
 
 @section('container')
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Dashboard</h1>
+    <h1 class="h2">Regional Office {{ $selectedRo }}</h1>
 </div>
+
 <style>
     .scrollable-data {
       width: 100%; /* Lebar sesuai kebutuhan */
@@ -14,7 +15,6 @@
     table {
         border-collapse: collapse;
         width: 100%;
-        font-size: 14px;
     }
 
     th, td {
@@ -35,6 +35,7 @@
                     <tr>
                         <th scope="col" style="background-color: #FFB562;text-align: center">No</th>
                         <th scope="col" style="background-color: #FFB562;text-align: center">Regional Office</th>
+                        <th scope="col" style="background-color: #FFB562;text-align: center">Jumlah <br> KC</th>
                         <th scope="col" style="background-color: #FFB562;text-align: center">Jumlah <br> ECHANNEL</th>
                         <th scope="col" style="background-color: #FFB562;text-align: center">Jumlah <br> ATM</th>
                         <th scope="col" style="background-color: #FFB562;text-align: center">Jumlah <br> CRM</th>
@@ -51,9 +52,10 @@
                 </thead>
                 <tbody>
                     @foreach ($data as $row)
-                    <tr >
+                    <tr>
                         <td style="background-color: #CDDEFF;text-align: center">{{ $loop->iteration }}</td>
-                        <td style="background-color: #CDDEFF;text-align: center"><a href="/ro/detail/{{ $row->namau }}">{{ $row->namau }}</a></td>
+                        <td style="background-color: #CDDEFF;text-align: center"><a href="/kc/detail/{{ $row->namau }}">{{ $row->namau }}</a></td>
+                        <td style="background-color: #CDDEFF;text-align: center">{{ $row->kodeu }}</td>
                         <td style="background-color: #CDDEFF;text-align: center">{{ $row->noe }}</td>
                         <td style="background-color: #CDDEFF;text-align: center">{{ $row->noa }}</td>
                         <td style="background-color: #CDDEFF;text-align: center">{{ $row->noc }}</td>
@@ -71,20 +73,19 @@
                         %</td>
                         <td style="background-color: {{ $row['psa'] < 100 ? '#FF6969' : '#00DFA2' }}; text-align: center">
                             {{ number_format($row['psa'], 2) }}
-                        %</td>
+                        </td>
                         <td style="background-color: {{ $row['psc'] < 100 ? '#FF6969' : '#00DFA2' }}; text-align: center">
                             {{ number_format($row['psc'], 2) }}
-                        %</td>
+                        </td>
                         <td style="background-color: {{ $row['pse'] < 100 ? '#FF6969' : '#00DFA2' }}; text-align: center">
                             {{ number_format($row['pse'], 2) }}
-                        %</td>
+                        </td>
                     </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
     </div>
-    
 
 <canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>
 @endsection

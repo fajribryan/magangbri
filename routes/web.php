@@ -6,6 +6,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\dashboardController;
 use App\Http\Controllers\InventarisController;
+use App\Http\Controllers\SurveyController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,18 +31,48 @@ Route::get('/register', [RegisterController::class, 'index']);
 Route::post('/register', [RegisterController::class, 'store']);
 
 Route::get('/dashboard', [dashboardController::class, 'index'])->middleware('auth');
+Route::get('/ro/detail/{namau}', [dashboardController::class, 'ro'])->middleware('auth');
+Route::get('/kc/detail/{namau}', [dashboardController::class, 'kc'])->middleware('auth');
+Route::get('/exportpremises/{kc}', [DashboardController::class, 'exportCsv'])->name('export.premiskc');
 
 
-Route::get('/akunuser', [AkunController::class, 'index']);
-Route::get('/akunuser/destroy/{id}', [AkunController::class, 'destroy']);
-Route::get('/akunuser/edit/{id}', [AkunController::class, 'edit']);
-Route::put('/update/{id}', [AkunController::class, 'update']);
+Route::get('/premisslm', [AkunController::class, 'index']);
+Route::get('/exportslm', [AkunController::class, 'exportslm']);
+Route::post('/exportexcellslm', [AkunController::class, 'exportexcellslm']);
 
 
-Route::get('/inventaris', [InventarisController::class, 'index'])->name('inventaris');
-Route::get('/inventaris/create', [InventarisController::class, 'create']);
-Route::post('/inventaris/input', [InventarisController::class, 'input'])->name('inventaris.input'); 
-Route::get('/inventaris/destroy/{id}', [InventarisController::class, 'destroy']);
-Route::get('/inventaris/edit/{id}', [InventarisController::class, 'edit']);
-Route::put('/inventaris/update/{id}', [InventarisController::class, 'update']);
+Route::resource('inventaris', InventarisController::class);
+Route::get('/nonslm/ro/{namau}', [InventarisController::class, 'ro'])->middleware('auth');
+Route::get('/inventarisexcel', [InventarisController::class, 'inventarisexcel']);
+Route::post('importexcel', [\App\Http\Controllers\InventarisController::class, 'importexcel'])->name('import.excel');
+// Tambahkan di dalam file web.php
+Route::get('/exportpremises/{ro}', [InventarisController::class, 'exportpremises'])->name('export.premis');
+
+
+Route::resource('survey', SurveyController::class);
+
+Route::get('/surveyadd', function () {
+    return view('admin/survey/surveyadd', [
+        'title' => 'Create survey',
+        'active' => 'Create survey',
+    ]);
+});
+
+Route::get('/surveyonsite', [SurveyController::class, 'surveyonsite']);
+Route::post('/jenislokasi', [SurveyController::class, 'jenislokasi']);
+
+
+
+
+
+
+// Route::get('/inventaris/add', function () {
+//     return view('admin/inventaris/buatinventaris');
+// });
+
+// Route::get('/inventaris', [InventarisController::class, 'index'])->name('inventaris');
+// Route::post('/inventaris/input', [InventarisController::class, 'input'])->name('inventaris.input'); 
+// Route::get('/inventaris/destroy/{id}', [InventarisController::class, 'destroy']);
+// Route::get('/inventaris/edit/{id}', [InventarisController::class, 'edit']);
+// Route::put('/inventaris/update/{id}', [InventarisController::class, 'update']);
 

@@ -26,9 +26,13 @@
 	<link rel="stylesheet" type="text/css" href="{{ asset ('/css/util.css') }}">
 	<link rel="stylesheet" type="text/css" href="{{ asset ('/css/main.css') }}">
 <!--===============================================================================================-->
+<style>
+	/* .gambar {
+		background-image: url("/storage/images/login.jpeg");
+	} */
+</style>
 </head>
-<body>
-	
+<body class="gambar" style="">
 	<div class="limiter">
 		<div class="container-login100">
 			<div class="wrap-login100">

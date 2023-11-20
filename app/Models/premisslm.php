@@ -5,16 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Inventaris extends Model
+class premisslm extends Model
 {
     use HasFactory;
-
-    protected $table = 'inventaris';
-
+    protected $table = 'premisesslm';
     protected $guarded = [
         'id',
     ];
-    protected $dateFormat = 'Y-m-d';
-
     public $timestamps = false;
 }
