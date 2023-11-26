@@ -33,33 +33,33 @@ Route::post('/register', [RegisterController::class, 'store']);
 Route::get('/dashboard', [dashboardController::class, 'index'])->middleware('auth');
 Route::get('/ro/detail/{namau}', [dashboardController::class, 'ro'])->middleware('auth');
 Route::get('/kc/detail/{namau}', [dashboardController::class, 'kc'])->middleware('auth');
-Route::get('/exportpremises/{kc}', [DashboardController::class, 'exportCsv'])->name('export.premiskc');
+Route::get('/exportpremiseskc/{kc}', [DashboardController::class, 'exportCsv'])->name('export.premiskc');
 
 
-Route::get('/premisslm', [AkunController::class, 'index']);
-Route::get('/exportslm', [AkunController::class, 'exportslm']);
-Route::post('/exportexcellslm', [AkunController::class, 'exportexcellslm']);
+Route::get('/premisslm', [AkunController::class, 'index'])->middleware('auth');
+Route::get('/exportslm', [AkunController::class, 'exportslm'])->middleware('auth');
+Route::post('/exportexcellslm', [AkunController::class, 'exportexcellslm'])->middleware('auth');
 
 
-Route::resource('inventaris', InventarisController::class);
+Route::resource('inventaris', InventarisController::class)->middleware('auth');
 Route::get('/nonslm/ro/{namau}', [InventarisController::class, 'ro'])->middleware('auth');
-Route::get('/inventarisexcel', [InventarisController::class, 'inventarisexcel']);
-Route::post('importexcel', [\App\Http\Controllers\InventarisController::class, 'importexcel'])->name('import.excel');
+Route::get('/inventarisexcel', [InventarisController::class, 'inventarisexcel'])->middleware('auth');
+Route::post('importexcel', [\App\Http\Controllers\InventarisController::class, 'importexcel'])->name('import.excel')->middleware('auth');
 // Tambahkan di dalam file web.php
-Route::get('/exportpremises/{ro}', [InventarisController::class, 'exportpremises'])->name('export.premis');
+Route::get('/exportpremisesro/{ro}', [InventarisController::class, 'exportpremises'])->name('export.premisro')->middleware('auth');
 
 
-Route::resource('survey', SurveyController::class);
+Route::resource('survey', SurveyController::class)->middleware('auth');
 
 Route::get('/surveyadd', function () {
     return view('admin/survey/surveyadd', [
         'title' => 'Create survey',
         'active' => 'Create survey',
     ]);
-});
+})->middleware('auth');
 
-Route::get('/surveyonsite', [SurveyController::class, 'surveyonsite']);
-Route::post('/jenislokasi', [SurveyController::class, 'jenislokasi']);
+Route::get('/surveyonsite', [SurveyController::class, 'surveyonsite'])->middleware('auth');
+Route::post('/jenislokasi', [SurveyController::class, 'jenislokasi'])->middleware('auth');
 
 
 

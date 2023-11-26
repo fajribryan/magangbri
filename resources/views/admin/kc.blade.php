@@ -15,6 +15,7 @@
     table {
         border-collapse: collapse;
         width: 100%;
+        font-size: 14px;
     }
 
     th, td {
@@ -70,7 +71,6 @@
                     @php
                         $row = $item['row'];
                         $premisesSas = $item['premisesSas'];
-                        $GARIS = $item['GARIS'];
                     @endphp
                     @foreach($premisesSas as $row2)
                     <tr>

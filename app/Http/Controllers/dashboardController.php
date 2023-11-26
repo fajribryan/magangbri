@@ -58,85 +58,102 @@ class dashboardController extends Controller
         ]);
     }
     public function kc($namau)
-    {
-        $lastDate = premis::orderBy('waktui', 'desc')->value('waktui');
-        $data = premis::where('namap', $namau)->paginate(5);
+{
+    // Mendapatkan data dengan TID unik dan waktu terbaru
+    $data = Premis::select('tid', \DB::raw('MAX(waktui) as latest_time'))
+        ->where('namap', $namau)
+        ->groupBy('tid')
+        ->get();
 
-        $data1 = [];
+    // Ambil waktu terbaru untuk setiap tid
+    $latestTimes = $data->pluck('latest_time', 'tid');
+
+    // Mendapatkan data lengkap dengan TID dan waktu terbaru
+    $data = Premis::whereIn('tid', $data->pluck('tid'))
+        ->whereIn('waktui', $latestTimes->values()) // Hanya entri dengan waktu terbaru
+        ->orWhereNull('waktui') // Tetapkan untuk entri tanpa waktui
+        ->where('namap', $namau)
+        ->get();
+
+    $data1 = [];
 
     foreach ($data as $row) {
-        $premisesSas = Premis::where('tid', $row->tid)->get();
-        $GARIS = $premisesSas->count() + 1;
+        $premisesSas = Premis::where('tid', $row->tid)
+            ->where(function ($query) use ($latestTimes) {
+                $query->whereNotNull('waktui')
+                    ->orWhereNull('waktui');
+            }) // Filter berdasarkan waktui
+            ->get();
 
         $data1[] = [
             'row' => $row,
             'premisesSas' => $premisesSas,
-            'GARIS' => $GARIS,
         ];
     }
-        return view('admin/kc', [
-            'title' => 'Kantor Cabang',
-            'active' => 'kc',
-            'data1' => $data1,
-            'selectedkc' => $namau,
-            'lastDate' => $lastDate,
-        ]);
-        // dd($data);
-    }
-    public function exportCsv($kc)
-    {
-        $data = Premis::where('kodep', $kc)->get();
-        $data1 = [];
 
-        foreach ($data as $row) {
-            $premisesSas = Premis::where('tid', $row->tid)->get();
-            $GARIS = $premisesSas->count() + 1;
+    $lastDate = $data->max('waktui'); // Mendapatkan waktu terbaru dari data
 
-            $data1[] = [
-                'row' => $row,
-                'premisesSas' => $premisesSas,
-                'GARIS' => $GARIS,
-            ];
-        }
+    return view('admin/kc', [
+        'title' => 'Kantor Cabang',
+        'active' => 'kc',
+        'data1' => $data1,
+        'selectedkc' => $namau,
+        'lastDate' => $lastDate,
+    ]);
+}
 
-        // Tentukan nama file CSV dan lokasi penyimpanan
-        $filename = 'export_kc.csv';
-        $filePath = storage_path('exports/' . $filename);
 
-        // Buka file untuk menulis
-        $handle = fopen($filePath, 'w');
 
-        // Tulis header CSV
+
+
+
+public function exportCsv($kc)
+{
+    // Mendapatkan TID unik dengan waktu terbaru
+    $latestTids = Premis::select('tid', \DB::raw('MAX(waktui) as latest_time'))
+        ->where('namap', $kc)
+        ->groupBy('tid')
+        ->get();
+
+    // Mendapatkan data dengan TID unik dan waktu terbaru
+    $data = Premis::whereIn('tid', $latestTids->pluck('tid'))
+        ->whereIn('waktui', $latestTids->pluck('latest_time'))
+        ->where('namap', $kc)
+        ->get();
+
+    $filename = 'export_kc.csv';
+    $filePath = storage_path('exports/' . $filename);
+
+    // Buka file untuk menulis
+    $handle = fopen($filePath, 'w');
+
+    // Tulis header CSV
+    fputcsv($handle, [
+        'Nama CPC', 'Nama KC', 'Perangkat', 'TID', 'Lokasi',
+        'Jenis Lokasi', 'Waktu Survey', 'Pekerja', 'Perusahaan',
+        'Score', 'Kondisi Mesin', 'Kondisi Ruangan', 'Kondisi Pintu',
+        'Kondisi Pylon', 'Foto Tengah Mesin', 'Foto Seluruh Mesin', 'Foto Ruangan', 'Foto Pintu', 'Foto Pylon'
+    ],';');
+
+    foreach ($data as $premisessa) {
+        $achieveValue = number_format($premisessa->achieve, 2, ',', '');
         fputcsv($handle, [
-            'Nama CPC', 'Nama KC', 'Perangkat', 'TID', 'Lokasi',
-            'Jenis Lokasi', 'Waktu Survey', 'Pekerja', 'Perusahaan',
-            'Score', 'Kondisi Mesin', 'Kondisi Ruangan', 'Kondisi Pintu',
-            'Kondisi Pylon', 'Foto Tengah Mesin', 'Foto Seluruh Mesin', 'Foto Ruangan', 'Foto Pintu', 'Foto Pylon'
-        ]);
-
-        // Tulis data ke dalam file CSV
-        foreach ($data1 as $item) {
-            $row = $item['row'];
-            $premisesSas = $item['premisesSas'];
-
-            foreach ($premisesSas as $premisessa) {
-                fputcsv($handle, [
-                    $premisessa->nama_cpc, $premisessa->namap, $premisessa->perangkat,
-                    $premisessa->tid, $premisessa->lokasi,
-                    $premisessa->jenis_lokasi, $premisessa->waktui, $premisessa->pekerja,
-                    $premisessa->perusahaan, $premisessa->achieve, $premisessa->kondisimesin,
-                    $premisessa->kondisiruangan, $premisessa->kondisipintu, $premisessa->kondisipylon,
-                    $premisessa->fototengahmesin_path, $premisessa->fotoseluruhmesin_path, $premisessa->fotoruangan_path,
-                    $premisessa->fotopintu_path, $premisessa->fotopylon_path,
-                ]);                
-            }
-        }
-
-        // Tutup file
-        fclose($handle);
-
-        // Kembalikan file untuk diunduh
-        return response()->download($filePath, $filename)->deleteFileAfterSend(true);
+            $premisessa->nama_cpc, $premisessa->namap, $premisessa->perangkat,
+            $premisessa->tid, $premisessa->lokasi,
+            $premisessa->jenis_lokasi, $premisessa->waktui, $premisessa->pekerja,
+            $premisessa->perusahaan, $achieveValue, $premisessa->kondisimesin,
+            $premisessa->kondisiruangan, $premisessa->kondisipintu, $premisessa->kondisipylon,
+            $premisessa->fototengahmesin_path, $premisessa->fotoseluruhmesin_path, $premisessa->fotoruangan_path,
+            $premisessa->fotopintu_path, $premisessa->fotopylon_path,
+        ],';');
     }
+
+    // Tutup file
+    fclose($handle);
+
+    // Kembalikan file untuk diunduh
+    return response()->download($filePath, $filename)->deleteFileAfterSend(true);
+}
+
 
 }

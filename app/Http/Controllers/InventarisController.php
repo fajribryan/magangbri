@@ -392,6 +392,8 @@ class InventarisController extends Controller
                 WHEN tipelokasi LIKE '%khusus%' AND jenislokasi LIKE '%onsite%' THEN (score / 3) * 100
                 WHEN tipelokasi LIKE '%sharing%' AND jenislokasi LIKE '%offsite%' THEN (score / 2) * 100
                 WHEN tipelokasi LIKE '%sharing%' AND jenislokasi LIKE '%onsite%' THEN score * 100
+                WHEN tipelokasi LIKE '%umum%' AND jenislokasi LIKE '%offsite%' THEN (score / 2) * 100
+                WHEN tipelokasi LIKE '%umum%' AND jenislokasi LIKE '%onsite%' THEN score * 100
                 ELSE NULL
             END")
         ]);
@@ -607,18 +609,19 @@ class InventarisController extends Controller
             'Jenis Lokasi', 'Waktu Survey', 'Pekerja', 'Perusahaan',
             'Score', 'Kondisi Mesin', 'Kondisi Ruangan', 'Kondisi Pintu',
             'Kondisi Pylon', 'Foto Tengah Mesin', 'Foto Seluruh Mesin', 'Foto Ruangan', 'Foto Pintu', 'Foto Pylon'
-        ]);
+        ],';');
 
+        
         foreach ($premisessas as $premisessa) {
             fputcsv($handle, [
                 $premisessa->nama_cpc, $premisessa->namap, $premisessa->perangkat,
                 $premisessa->tid, $premisessa->lokasi,
                 $premisessa->jenis_lokasi, $premisessa->waktui, $premisessa->pekerja,
-                $premisessa->perusahaan, $premisessa->achieve, $premisessa->kondisimesin,
+                $premisessa->perusahaan, number_format($premisessa->achieve, 2, ',', ''), $premisessa->kondisimesin,
                 $premisessa->kondisiruangan, $premisessa->kondisipintu, $premisessa->kondisipylon,
                 $premisessa->fototengahmesin, $premisessa->fotoseluruhmesin, $premisessa->fotoruangan,
                 $premisessa->fotopintu, $premisessa->fotopylon,
-            ]);
+            ],';');
         }
 
         // Tutup file

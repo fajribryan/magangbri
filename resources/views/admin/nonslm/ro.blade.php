@@ -15,6 +15,7 @@
     table {
         border-collapse: collapse;
         width: 100%;
+        font-size: 14px;
     }
 
     th, td {
@@ -38,7 +39,7 @@
             </h3>
         </div>
         <div class="col">
-            <a href="{{ route('export.premis') }}">
+            <a href="{{ route('export.premisro', ['ro' => $selectedRo]) }}">
                 <button type="button" class="btn btn-primary"> Export Excell</button>
             </a>
         </div>

@@ -5,7 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\lokasi;
 use App\Models\premisslm;
+use App\Models\premis0;
+use App\Models\rankingsa;
+use App\Models\premisesslm;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AkunController extends Controller
 {
@@ -27,12 +31,12 @@ class AkunController extends Controller
     {
 
         // Panggil metode untuk memproses data dari URL eksternal
-        $this->processDataFromExternalURLatm(); 
-        $this->processDataFromExternalURLcrm(); 
+        // $this->processDataFromExternalURLatm(); 
+        // $this->processDataFromExternalURLcrm(); 
         // Import data dari file Excel
-        $this->importpremisessa($request);
-        $this->gabungpremis0danpremisessa();
-        $this->inputyangbelumadadipremisessa();
+        // $this->importpremisessa($request);
+        // $this->gabungpremis0danpremisessa();
+        // $this->inputyangbelumadadipremisessa();
         $this->scorepremisessa();
         $this->rangkingsaro();
         $this->rangkingsakc();
